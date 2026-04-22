@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #030712; }
+  ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #374151; }
+}
+
+@layer components {
+  .card {
+    @apply bg-gray-900 border border-gray-800 rounded-xl;
+  }
+
+  .btn-primary {
+    @apply bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600
+           text-gray-950 font-semibold rounded-lg px-5 py-2.5
+           transition-colors duration-150 disabled:opacity-40
+           disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 active:bg-gray-900
+           text-gray-100 font-medium rounded-lg px-5 py-2.5
+           border border-gray-700 transition-colors duration-150;
+  }
+
+  .btn-ghost {
+    @apply text-gray-400 hover:text-gray-100 font-medium
+           transition-colors duration-150;
+  }
+
+  .badge {
+    @apply text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+
+  .wave-line {
+    stroke-dasharray: 6 3;
+    animation: dash 8s linear infinite;
+  }
+
+  @keyframes dash {
+    to { stroke-dashoffset: -90; }
+  }
+}
