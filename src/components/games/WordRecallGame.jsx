@@ -186,11 +186,11 @@ export default function WordRecallGame({ difficulty, onComplete }) {
         <div>
           <h2 className="text-xl font-semibold text-gray-100 mb-2">Word Encoding</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Study <strong className="text-gray-200">{params.count} words</strong> for 15 seconds.
+            Study <strong className="text-gray-200">{params.count} words</strong> for 20 seconds.
             After a 10-second math distractor, free-recall as many as you can.{' '}
             <span className="text-cyan-400">100% recall in under 30s</span> unlocks an immediate-access bonus.
           </p>
-          <p className="text-gray-600 text-xs mt-2">15s to memorise · 45s to recall</p>
+          <p className="text-gray-600 text-xs mt-2">20s to memorise · 45s to recall</p>
         </div>
         <button className="btn-primary w-full" onClick={startGame} disabled={fetching}>
           {fetching ? 'Loading words…' : 'Begin'}

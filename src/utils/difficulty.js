@@ -31,13 +31,13 @@ export const SPATIAL_PARAMS = {
   5: { size: 12, cells: 30, studyMs: 2000, sequential: true  },
 }
 
-// Word recall: 15s encoding, 10s math distractor
+// Word recall: 8 words, 20s encoding, 10s math distractor
 export const WORD_PARAMS = {
-  1: { count: 6,  studyMs: 15000, distractors: 2, distractorMs: 10000 },
-  2: { count: 8,  studyMs: 15000, distractors: 3, distractorMs: 10000 },
-  3: { count: 10, studyMs: 15000, distractors: 4, distractorMs: 10000 },
-  4: { count: 12, studyMs: 15000, distractors: 5, distractorMs: 10000 },
-  5: { count: 15, studyMs: 15000, distractors: 6, distractorMs: 10000 },
+  1: { count: 8, studyMs: 20000, distractors: 2, distractorMs: 10000 },
+  2: { count: 8, studyMs: 20000, distractors: 3, distractorMs: 10000 },
+  3: { count: 8, studyMs: 20000, distractors: 4, distractorMs: 10000 },
+  4: { count: 8, studyMs: 20000, distractors: 5, distractorMs: 10000 },
+  5: { count: 8, studyMs: 20000, distractors: 6, distractorMs: 10000 },
 }
 
 export const GAME_META = {
