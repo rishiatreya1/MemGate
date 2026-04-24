@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NBACK_PARAMS } from '../../utils/difficulty'
 
 const LETTERS = 'BCDFGHJKLMNPQRSTVWXZ'.split('')
-const GRID_SIZE = 3   // 3×3 = 9 positions for dual N-back
+const GRID_SIZE = 3
 
-// Generate letter sequence + position sequence (independently)
+const GAME_SECONDS = 30
+
 function generateSequence(length, N) {
   const letters   = []
   const positions = []
 
   for (let i = 0; i < length; i++) {
-    // ~30 % chance of letter match at eligible positions
     if (i >= N && Math.random() < 0.3) {
       letters.push(letters[i - N])
     } else {
@@ -20,13 +20,15 @@ function generateSequence(length, N) {
       letters.push(l)
     }
 
-    // ~30 % chance of position match (independent of letter)
     if (i >= N && Math.random() < 0.3) {
       positions.push(positions[i - N])
     } else {
       let p
       do { p = Math.floor(Math.random() * (GRID_SIZE * GRID_SIZE)) }
-      while (i >= N && p === positions[i - N])
+      while (
+        (i >= N && p === positions[i - N]) ||
+        (i > 0  && p === positions[i - 1])
+      )
       positions.push(p)
     }
   }
@@ -34,7 +36,6 @@ function generateSequence(length, N) {
   return { letters, positions }
 }
 
-// 3×3 grid showing the current letter at the active position
 function PositionGrid({ position, letter, feedback }) {
   const cells = GRID_SIZE * GRID_SIZE
   return (
@@ -64,7 +65,6 @@ function PositionGrid({ position, letter, feedback }) {
   )
 }
 
-// Simple letter-only display for non-dual mode
 function LetterDisplay({ letter, feedback }) {
   const borderClass = feedback === 'correct' ? 'border-cyan-400/60 animate-flashCorrect'
                     : feedback === 'wrong'   ? 'border-red-400/60  animate-flashWrong'
@@ -83,20 +83,20 @@ function ResultsScreen({ results, dual, onDone }) {
 
   const rows = dual
     ? [
-        { label: 'Letter hits',             v: letterHits, c: 'text-emerald-400' },
-        { label: 'Letter correct rejections',v: letterCRs,  c: 'text-emerald-400' },
-        { label: 'Letter misses',            v: letterMisses,c:'text-red-400'     },
-        { label: 'Letter false alarms',      v: letterFAs,   c:'text-orange-400'  },
-        { label: 'Position hits',            v: posHits,    c: 'text-violet-400'  },
-        { label: 'Position correct rej.',    v: posCRs,     c: 'text-violet-400'  },
-        { label: 'Position misses',          v: posMisses,  c: 'text-red-400'     },
-        { label: 'Position false alarms',    v: posFAs,     c: 'text-orange-400'  },
+        { label: 'Letter hits',              v: letterHits,  c: 'text-emerald-400' },
+        { label: 'Letter correct rej.',      v: letterCRs,   c: 'text-emerald-400' },
+        { label: 'Letter misses',            v: letterMisses,c: 'text-red-400'     },
+        { label: 'Letter false alarms',      v: letterFAs,   c: 'text-orange-400'  },
+        { label: 'Position hits',            v: posHits,     c: 'text-violet-400'  },
+        { label: 'Position correct rej.',    v: posCRs,      c: 'text-violet-400'  },
+        { label: 'Position misses',          v: posMisses,   c: 'text-red-400'     },
+        { label: 'Position false alarms',    v: posFAs,      c: 'text-orange-400'  },
       ]
     : [
-        { label: 'Correct hits',       v: letterHits, c: 'text-emerald-400' },
-        { label: 'Correct rejections', v: letterCRs,  c: 'text-emerald-400' },
-        { label: 'Misses',             v: letterMisses,c:'text-red-400'     },
-        { label: 'False alarms',       v: letterFAs,   c:'text-orange-400'  },
+        { label: 'Correct hits',       v: letterHits,  c: 'text-emerald-400' },
+        { label: 'Correct rejections', v: letterCRs,   c: 'text-emerald-400' },
+        { label: 'Misses',             v: letterMisses,c: 'text-red-400'     },
+        { label: 'False alarms',       v: letterFAs,   c: 'text-orange-400'  },
       ]
 
   return (
@@ -106,7 +106,7 @@ function ResultsScreen({ results, dual, onDone }) {
         <div className="text-gray-400 text-sm mt-1">accuracy · {total} scoreable steps</div>
       </div>
 
-      <div className={`grid gap-2 w-full max-w-xs ${dual ? 'grid-cols-2' : 'grid-cols-2'}`}>
+      <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
         {rows.map(({ label, v, c }) => (
           <div key={label} className="card p-3 text-center">
             <div className={`text-xl font-semibold ${c}`}>{v}</div>
@@ -124,20 +124,27 @@ export default function NBackGame({ difficulty, onComplete }) {
   const params = NBACK_PARAMS[difficulty]
   const { dual } = params
 
-  const [phase,     setPhase]     = useState('instructions')
-  const [seq,       setSeq]       = useState({ letters: [], positions: [] })
-  const [stepIdx,   setStepIdx]   = useState(0)
-  const [lResponded, setLRespd]   = useState(false)   // letter response given
-  const [pResponded, setPRespd]   = useState(false)   // position response given
-  const [feedback,  setFeedback]  = useState(null)    // 'correct'|'wrong'|null (letter-response feedback)
-  const letterResps = useRef({})
-  const posResps    = useRef({})
-  const resultsRef  = useRef(null)
+  const [phase,      setPhase]     = useState('instructions')
+  const [seq,        setSeq]       = useState({ letters: [], positions: [] })
+  const [stepIdx,    setStepIdx]   = useState(0)
+  const [timeLeft,   setTimeLeft]  = useState(GAME_SECONDS)
+  const [lResponded, setLRespd]    = useState(false)
+  const [pResponded, setPRespd]    = useState(false)
+  const [feedback,   setFeedback]  = useState(null)
+  const letterResps  = useRef({})
+  const posResps     = useRef({})
+  const resultsRef   = useRef(null)
+  const stepIdxRef   = useRef(0)
+
+  useEffect(() => { stepIdxRef.current = stepIdx }, [stepIdx])
 
   function startGame() {
-    const s = generateSequence(params.length, params.N)
+    // Generate enough steps to outlast the 30s timer at any difficulty
+    const buffer = Math.ceil((GAME_SECONDS / (params.stimMs / 1000)) * 2) + params.N + 4
+    const s = generateSequence(buffer, params.N)
     setSeq(s)
     setStepIdx(0)
+    setTimeLeft(GAME_SECONDS)
     setLRespd(false); setPRespd(false)
     setFeedback(null)
     letterResps.current = {}; posResps.current = {}
@@ -145,33 +152,37 @@ export default function NBackGame({ difficulty, onComplete }) {
     setPhase('playing')
   }
 
-  // Advance sequence on a chained timeout
+  // 30-second game timer
+  useEffect(() => {
+    if (phase !== 'playing') return
+    if (timeLeft <= 0) {
+      resultsRef.current = calcResults(stepIdxRef.current)
+      setPhase('results')
+      return
+    }
+    const t = setTimeout(() => setTimeLeft(s => s - 1), 1000)
+    return () => clearTimeout(t)
+  }, [phase, timeLeft])
+
+  // Step advancement
   useEffect(() => {
     if (phase !== 'playing' || seq.letters.length === 0) return
     const t = setTimeout(() => {
-      if (stepIdx >= seq.letters.length - 1) {
-        resultsRef.current = calcResults()
-        setPhase('results')
-      } else {
-        setStepIdx(i => i + 1)
-        setLRespd(false); setPRespd(false)
-        setFeedback(null)
-      }
+      setStepIdx(i => i + 1)
+      setLRespd(false); setPRespd(false)
+      setFeedback(null)
     }, params.stimMs)
     return () => clearTimeout(t)
-  })  // intentionally no deps — re-runs each render during 'playing' but only timer fires
-
-  // Only schedule during playing phase
-  useEffect(() => {}, [phase, stepIdx])
+  })
 
   // Keyboard shortcuts
   useEffect(() => {
     if (phase !== 'playing') return
     function onKey(e) {
       if (e.key === 'l' || e.key === 'L') respondLetter(true)
-      if (e.key === 'a' || e.key === 'A') respondLetter(false)   // 'A' = letter no-match
+      if (e.key === 'a' || e.key === 'A') respondLetter(false)
       if (e.key === 'p' || e.key === 'P') respondPos(true)
-      if (e.key === 's' || e.key === 'S') respondPos(false)      // 'S' = position no-match
+      if (e.key === 's' || e.key === 'S') respondPos(false)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -191,12 +202,11 @@ export default function NBackGame({ difficulty, onComplete }) {
     setPRespd(true)
   }
 
-  function calcResults() {
+  function calcResults(maxStep) {
     let letterHits = 0, letterMisses = 0, letterFAs = 0, letterCRs = 0
     let posHits    = 0, posMisses    = 0, posFAs    = 0, posCRs    = 0
-    const total = seq.letters.length - params.N
 
-    for (let i = params.N; i < seq.letters.length; i++) {
+    for (let i = params.N; i <= maxStep; i++) {
       const lMatch = seq.letters[i]   === seq.letters[i - params.N]
       const pMatch = seq.positions[i] === seq.positions[i - params.N]
       const userL  = letterResps.current[i] ?? false
@@ -215,11 +225,12 @@ export default function NBackGame({ difficulty, onComplete }) {
       else                   posCRs++
     }
 
+    const total         = Math.max(0, maxStep - params.N + 1)
     const letterCorrect = letterHits + letterCRs
     const posCorrect    = posHits    + posCRs
     const score = dual
-      ? Math.round((letterCorrect + posCorrect) / (2 * total) * 100)
-      : Math.round(letterCorrect / total * 100)
+      ? Math.round((letterCorrect + posCorrect) / Math.max(1, 2 * total) * 100)
+      : Math.round(letterCorrect / Math.max(1, total) * 100)
 
     return { letterHits, letterMisses, letterFAs, letterCRs,
              posHits, posMisses, posFAs, posCRs, total, score }
@@ -229,12 +240,12 @@ export default function NBackGame({ difficulty, onComplete }) {
     if (resultsRef.current) onComplete(resultsRef.current.score, 'nback')
   }
 
-  const progress  = seq.letters.length > 0 ? (stepIdx + 1) / seq.letters.length : 0
-  const eligible  = stepIdx >= params.N
-  const letter    = seq.letters[stepIdx]
-  const position  = seq.positions?.[stepIdx] ?? 0
+  const eligible = stepIdx >= params.N
+  const letter   = seq.letters[stepIdx]  ?? ''
+  const position = seq.positions[stepIdx] ?? 0
 
-  // ── Instructions ─────────────────────────────────────────────────────────────
+  const timerColor = timeLeft <= 10 ? 'text-red-400' : timeLeft <= 20 ? 'text-amber-400' : 'text-cyan-400'
+
   if (phase === 'instructions') {
     return (
       <div className="flex flex-col items-center gap-6 max-w-sm mx-auto text-center animate-fadeUp">
@@ -261,7 +272,7 @@ export default function NBackGame({ difficulty, onComplete }) {
               Position: <kbd className="font-mono">P</kbd> match · <kbd className="font-mono">S</kbd> no-match
             </p>
           )}
-          <p className="text-gray-600 text-xs mt-2">{params.length} stimuli</p>
+          <p className="text-gray-600 text-xs mt-2">30 second game</p>
         </div>
         <button className="btn-primary w-full" onClick={startGame}>Begin</button>
       </div>
@@ -272,30 +283,28 @@ export default function NBackGame({ difficulty, onComplete }) {
     return <ResultsScreen results={resultsRef.current} dual={dual} onDone={handleDone} />
   }
 
-  // ── Playing ───────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col items-center gap-5 animate-fadeUp">
-      {/* Progress */}
+      {/* Timer + step info */}
       <div className="w-full max-w-xs">
-        <div className="flex justify-between text-xs text-gray-600 mb-1.5">
-          <span>Step {stepIdx + 1} / {seq.letters.length}</span>
-          <span>{params.N}-back{dual ? ' · dual' : ''}</span>
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-xs text-gray-600">Step {stepIdx + 1} · {params.N}-back{dual ? ' · dual' : ''}</span>
+          <span className={`text-2xl font-bold tabular-nums ${timerColor}`}>{timeLeft}s</span>
         </div>
-        <div className="h-1 bg-gray-800 rounded-full">
-          <div className="h-1 bg-cyan-500 rounded-full transition-all duration-300"
-               style={{ width: `${progress * 100}%` }} />
+        <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+          <div
+            className={`h-1 rounded-full transition-all duration-1000 ${timeLeft <= 10 ? 'bg-red-400' : 'bg-cyan-500'}`}
+            style={{ width: `${(timeLeft / GAME_SECONDS) * 100}%` }}
+          />
         </div>
       </div>
 
-      {/* Stimulus */}
       {dual
         ? <PositionGrid position={position} letter={letter} feedback={feedback} />
         : <LetterDisplay letter={letter} feedback={feedback} />
       }
 
-      {/* Response buttons */}
-      <div className={`grid gap-3 w-full max-w-xs ${dual ? 'grid-cols-2' : 'grid-cols-2'}`}>
-        {/* Letter match */}
+      <div className={`grid gap-3 w-full max-w-xs grid-cols-2`}>
         <button
           className={`py-3 rounded-lg font-semibold text-sm border transition-all ${
             !eligible || lResponded
@@ -309,7 +318,6 @@ export default function NBackGame({ difficulty, onComplete }) {
         </button>
 
         {dual ? (
-          /* Position match */
           <button
             className={`py-3 rounded-lg font-semibold text-sm border transition-all ${
               !eligible || pResponded
@@ -322,7 +330,6 @@ export default function NBackGame({ difficulty, onComplete }) {
             Position match <span className="text-xs opacity-50 block">[P]</span>
           </button>
         ) : (
-          /* No match (single mode) */
           <button
             className={`py-3 rounded-lg font-semibold text-sm border transition-all ${
               !eligible || lResponded
