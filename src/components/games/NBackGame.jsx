@@ -164,7 +164,7 @@ export default function NBackGame({ difficulty, onComplete }) {
     return () => clearTimeout(t)
   }, [phase, timeLeft])
 
-  // Step advancement
+  // Step advancement — deps on [phase, stepIdx] so the 1s timeLeft tick doesn't reset this timer
   useEffect(() => {
     if (phase !== 'playing' || seq.letters.length === 0) return
     const t = setTimeout(() => {
@@ -173,7 +173,7 @@ export default function NBackGame({ difficulty, onComplete }) {
       setFeedback(null)
     }, params.stimMs)
     return () => clearTimeout(t)
-  })
+  }, [phase, stepIdx, seq.letters.length])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -186,7 +186,7 @@ export default function NBackGame({ difficulty, onComplete }) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  })
+  }, [phase, stepIdx, lResponded, pResponded])
 
   function respondLetter(isMatch) {
     if (phase !== 'playing' || stepIdx < params.N || lResponded) return
