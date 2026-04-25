@@ -138,7 +138,3 @@ expo-app/                   # Mobile app (Expo / React Native)
 ```
 
 ---
-
-## License
-
-MIT
