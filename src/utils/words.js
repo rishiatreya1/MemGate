@@ -38,22 +38,24 @@ async function isRealWord(word) {
 
 /**
  * Pick `count` words from the pool, validated against dictionaryapi.dev.
- * Falls back to the local pool directly if all API calls fail.
+ * Validates only the selected words (not a larger candidate pool) to keep
+ * requests minimal. Falls back to the local pool if the API is unreachable.
  */
 export async function fetchWords(count) {
-  const shuffled   = [...WORD_POOL].sort(() => Math.random() - 0.5)
-  const candidates = shuffled.slice(0, count * 3)  // 3x buffer in case some fail
+  const shuffled = [...WORD_POOL].sort(() => Math.random() - 0.5)
+  const selected = shuffled.slice(0, count)
 
   try {
-    const valid = []
-    const checks = await Promise.all(candidates.map(isRealWord))
-    candidates.forEach((w, i) => { if (checks[i]) valid.push(w) })
-    if (valid.length >= count) return valid.slice(0, count)
+    const checks = await Promise.all(selected.map(isRealWord))
+    // All curated pool words should pass; filter out any rare API rejections
+    const valid = selected.filter((_, i) => checks[i])
+    if (valid.length === count) return valid
+    // If some failed, fill from the remainder of the shuffled pool
+    const backup = shuffled.slice(count).filter(w => !selected.includes(w))
+    return [...valid, ...backup].slice(0, count)
   } catch {
-    // fall through
+    return selected
   }
-
-  return shuffled.slice(0, count)
 }
 
 export function sampleWords(count) {

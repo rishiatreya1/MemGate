@@ -18,11 +18,12 @@ function cellPx(size) {
   if (size <= 3)  return 64
   if (size <= 4)  return 56
   if (size <= 6)  return 42
-  return 26
+  return 22   // 12×12: 12*22 + 11*3 = 297px — fits inside max-w-sm card
 }
 
 function gapPx(size) {
-  return size <= 6 ? 6 : 4
+  if (size <= 6) return 6
+  return 3
 }
 
 function calcScore(pattern, selected) {

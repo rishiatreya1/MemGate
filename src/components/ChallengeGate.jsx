@@ -1,7 +1,29 @@
-import { useState } from 'react'
+import { useState, Component } from 'react'
 import NBackGame from './games/NBackGame'
 import SpatialRecallGame from './games/SpatialRecallGame'
 import WordRecallGame from './games/WordRecallGame'
+
+class GameErrorBoundary extends Component {
+  state = { crashed: false }
+  static getDerivedStateFromError() { return { crashed: true } }
+  render() {
+    if (this.state.crashed) {
+      return (
+        <div className="text-center space-y-3 py-6">
+          <div className="text-red-400 font-medium">Game failed to load</div>
+          <div className="text-gray-500 text-sm">Try refreshing the page.</div>
+          <button
+            className="btn-primary text-sm px-6 mt-2"
+            onClick={() => this.setState({ crashed: false })}
+          >
+            Retry
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 const GAMES    = ['nback', 'spatial', 'word']
 const LABELS   = { nback: 'N-Back', spatial: 'Spatial Recall', word: 'Word Encoding' }
@@ -95,9 +117,11 @@ export default function ChallengeGate({ site, returnUrl, difficulty, onPass }) {
             Challenge · <span className="text-gray-200">{site}</span>
           </span>
         </div>
-        <div className="flex-1 flex items-center justify-center p-6">
-          <div className="w-full max-w-sm card p-6">
-            <GameComponent difficulty={difficulty} onComplete={handleComplete} />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg card p-6">
+            <GameErrorBoundary key={gamePick}>
+              <GameComponent difficulty={difficulty} onComplete={handleComplete} />
+            </GameErrorBoundary>
           </div>
         </div>
       </div>
