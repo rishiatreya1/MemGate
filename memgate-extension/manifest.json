@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "MemGate",
+  "version": "1.0",
+  "description": "Gate locked sites behind a memory challenge before granting access.",
+
+  "permissions": ["webNavigation", "tabs", "storage"],
+  "host_permissions": ["<all_urls>"],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://memgateofficial.web.app/*", "http://localhost:5173/*"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
