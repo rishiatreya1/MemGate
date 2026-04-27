@@ -235,4 +235,4 @@ MemGate/
 
 ## License
 
-MIT — free to use, fork, and modify.
+Rishi Atreya
