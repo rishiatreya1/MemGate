@@ -4,6 +4,8 @@
 
 **Live app → [memgateofficial.web.app](https://memgateofficial.web.app)**
 
+**Demo → (https://youtu.be/bW2NCtlvW0w?si=FXCbkwl7PoD_O_ND)**
+
 ---
 
 ## How it works
