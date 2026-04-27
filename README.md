@@ -73,7 +73,7 @@ The game ends when the **30-second timer** runs out. Your score is accuracy acro
 
 ### Spatial Recall — Visuospatial memory (4 rounds)
 
-Four rounds of increasing grid size. Each pattern is shown for **5 seconds** — memorise it, then click to reproduce it from memory.
+Four rounds of increasing grid size. Each pattern is shown for **5 seconds** — memorize it, then click to reproduce it from memory.
 
 | Round | Grid | Cells to remember |
 |---|---|---|
@@ -93,7 +93,7 @@ Your **combined average** across all four rounds must reach 60% to pass.
 
 ### Word Encoding — Episodic memory
 
-1. **Study** — 20 seconds to memorise 8 common English words
+1. **Study** — 20 seconds to memorize 8 common English words
 2. **Distractor** — solve quick arithmetic problems for 10 seconds (designed to flush short-term memory)
 3. **Recall** — 45 seconds to type back as many words as you can remember
 

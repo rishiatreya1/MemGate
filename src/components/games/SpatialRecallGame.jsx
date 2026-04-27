@@ -146,7 +146,7 @@ export default function SpatialRecallGame({ onComplete }) {
           <h2 className="text-xl font-semibold text-gray-100 mb-2">Spatial Recall</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
             Four rounds of increasing grid size: 3×3 → 4×4 → 6×6 → 12×12.
-            Each pattern flashes for <strong className="text-gray-200">5 seconds</strong> — memorise it, then reproduce it.
+            Each pattern flashes for <strong className="text-gray-200">5 seconds</strong> — memorize it, then reproduce it.
             Score <strong className="text-cyan-400">≥{PASS_THRESHOLD}% combined</strong> to pass.
           </p>
           <div className="flex justify-center gap-3 mt-3">
@@ -169,7 +169,7 @@ export default function SpatialRecallGame({ onComplete }) {
             Round {roundIdx + 1} / {ROUNDS.length} · {round.label}
           </div>
           <div className="text-3xl font-bold text-cyan-400 tabular-nums">{countdown}</div>
-          <div className="text-gray-500 text-sm">Memorise this pattern</div>
+          <div className="text-gray-500 text-sm">Memorize this pattern</div>
         </div>
         <Grid size={round.size} litCells={pattern} selectedCells={new Set()} interactive={false} />
         <div className="w-full max-w-sm h-1 bg-gray-800 rounded-full overflow-hidden">
