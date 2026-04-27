@@ -1,58 +1,176 @@
 # MemGate
 
-A cognitive training web app that acts as a paywall for distraction. Complete three memory games to unlock access to the sites you want to visit — rewiring your brain's relationship with impulsive browsing.
+> **Earn your distractions.** MemGate gates your most-visited time-sink sites behind a quick memory challenge. Pass the test, get 10 minutes of access. Skip the test, skip the site.
 
-Built with React + Vite + Firebase + Tailwind CSS.
+**Live app → [memgateofficial.web.app](https://memgateofficial.web.app)**
 
 ---
 
-## What it does
+## How it works
 
-Before you can access a blocked site, you have to earn it. MemGate puts three cognitive challenges between you and the distraction:
+1. You add a site to your lock list (e.g. YouTube, Reddit, Twitter)
+2. The Chrome extension intercepts any navigation to that site
+3. You're redirected to a 60-second memory challenge
+4. Score ≥ 60% → 10 minutes of access granted
+5. Time's up → the gate resets
 
-| Game | Tests | Mechanic |
+Difficulty adapts automatically based on your performance across sessions.
+
+---
+
+## Quick start — no setup needed
+
+**You only need two things:**
+
+### Step 1 — Sign in to the web app
+
+Go to **[memgateofficial.web.app](https://memgateofficial.web.app)** and sign in with Google.
+
+### Step 2 — Install the Chrome extension
+
+1. [Download or clone this repo](https://github.com/rishiatreya1/MemGate)
+2. Open Chrome and go to **`chrome://extensions`**
+3. Toggle **Developer mode** on (top-right corner)
+4. Click **Load unpacked**
+5. Select the **`memgate-extension/`** folder from this repo
+6. The MemGate extension icon will appear in your toolbar
+
+> **Note:** The extension must stay installed and enabled for site blocking to work. You do not need to reload it after signing in.
+
+### Step 3 — Add sites to your lock list
+
+1. In the MemGate web app, go to **Lock Mode** (padlock icon in the nav)
+2. Toggle **Enable Lock Mode** on
+3. Type a site name (e.g. `youtube.com`) and click **Add**
+4. Choose which game that site requires, or leave it on **Any game**
+
+That's it. Next time you navigate to that site, the challenge gate will intercept it.
+
+---
+
+## The games
+
+All three games appear at random when you hit a gated site. Your score must be **≥ 60%** to unlock access.
+
+### N-Back — Working memory (30 seconds)
+
+A letter flashes on screen every 1–2 seconds. You must identify when the **current letter or position matches the one shown N steps earlier**.
+
+| Difficulty | Mode | Interval |
 |---|---|---|
-| **N-Back** | Working memory | Identify when a letter/position matches N steps ago — 30 second game |
-| **Spatial Recall** | Visuospatial memory | Memorise a 4×4 grid pattern (5s), recall it; if you pass, tackle a harder 6×6 with two sequential flashes |
-| **Word Encoding** | Episodic memory | Study a word list for 15s, complete a math distractor, then free-recall as many words as possible |
+| Novice | Single (letter only) | 2.2s |
+| Apprentice+ | Dual (letter + position) | 2.0s → 1.0s |
 
-Difficulty adapts based on your performance (1–5). Scores and streaks are synced to Firebase so your progress persists across devices.
+**Controls:**
+- `L` — letter matches N steps ago
+- `P` — position matches N steps ago *(dual mode)*
+- `A` — letter does not match
+- `S` — position does not match
+
+The game ends when the **30-second timer** runs out. Your score is accuracy across all scoreable steps.
+
+---
+
+### Spatial Recall — Visuospatial memory (4 rounds)
+
+Four rounds of increasing grid size. Each pattern is shown for **5 seconds** — memorise it, then click to reproduce it from memory.
+
+| Round | Grid | Cells to remember |
+|---|---|---|
+| 1 | 3×3 | 3 |
+| 2 | 4×4 | 5 |
+| 3 | 6×6 | 10 |
+| 4 | 12×12 | 18 |
+
+Your **combined average** across all four rounds must reach 60% to pass.
+
+**Color guide after submitting:**
+- Green = correct cell
+- Faded cyan = cell you missed
+- Red = cell you selected that wasn't in the pattern
+
+---
+
+### Word Encoding — Episodic memory
+
+1. **Study** — 20 seconds to memorise 8 common English words
+2. **Distractor** — solve quick arithmetic problems for 10 seconds (designed to flush short-term memory)
+3. **Recall** — 45 seconds to type back as many words as you can remember
+
+Score = (words correctly recalled) / 8 × 100%.
+
+**Bonus:** Recall all 8 words in under 30 seconds → Immediate Access unlocked (no timer).
 
 ---
 
 ## Features
 
-- **Chrome Extension** — intercepts blocked sites and redirects to the challenge gate
-- **Adaptive difficulty** — scores ≥ 85% advance difficulty; < 55% drops it
-- **Streak tracking** — daily training streak with Firebase sync
-- **Leaderboard** — compare scores across sessions
-- **Lock Mode** — manage which sites require a cognitive challenge to unlock
-- **Immediate Access bonus** — 100% word recall in under 30s skips the gate entirely
+- **Adaptive difficulty** — 5 levels (Novice → Master). Score ≥ 85% advances; < 55% drops you back.
+- **Daily streak** — tracks consecutive days of training, synced to your account
+- **Score history** — trend charts show your cognitive performance over time
+- **Leaderboard** — see how your scores compare across sessions
+- **Per-site game assignment** — lock YouTube to Word Recall, Reddit to N-Back, etc.
+- **10-minute unlock window** — pass once, browse freely for 10 minutes before the gate resets
+- **Cross-device sync** — scores and settings stored in Firebase, available on any device you sign in to
 
 ---
 
-## Stack
+## Chrome extension — detailed install
 
-- **React 18** + **Vite**
-- **Firebase** (Auth + Firestore)
-- **Tailwind CSS**
-- **Recharts** for score trend charts
+The extension is a local unpacked extension (not on the Chrome Web Store yet). Here is the full install flow:
+
+```
+1. Download this repo
+   → Click "Code" → "Download ZIP" on GitHub, then unzip
+   OR
+   → git clone https://github.com/rishiatreya1/MemGate.git
+
+2. Open Chrome
+   → Type chrome://extensions in the address bar and press Enter
+
+3. Enable Developer Mode
+   → Toggle the switch in the top-right corner of the Extensions page
+
+4. Load the extension
+   → Click "Load unpacked"
+   → Navigate to the unzipped/cloned folder
+   → Select the memgate-extension/ subfolder
+   → Click "Select Folder"
+
+5. Confirm it's active
+   → You should see "MemGate" appear in your extensions list
+   → Pin it to your toolbar via the puzzle-piece icon if you want quick access
+
+6. Sign in to the web app
+   → Go to https://memgateofficial.web.app and sign in with Google
+   → The extension reads your lock list from the app automatically
+```
+
+> **Troubleshooting:** If the extension isn't intercepting sites, make sure:
+> - Lock Mode is toggled **on** in the app
+> - The site is in your lock list with **enabled** toggled on
+> - You are signed in to the web app in the same browser
 
 ---
 
-## Setup
+## Developer setup
 
-### 1. Clone and install
+Only needed if you want to run or modify the code locally.
+
+### Prerequisites
+- Node.js 18+
+- Firebase CLI (`npm install -g firebase-tools`)
+- A Firebase project with Firestore + Google Auth enabled
+
+### Install and run
 
 ```bash
-git clone https://github.com/your-username/memgate.git
-cd memgate
+git clone https://github.com/rishiatreya1/MemGate.git
+cd MemGate/memgate
 npm install
 ```
 
-### 2. Firebase config
-
-Create a `.env` file in the `memgate/` directory:
+Create a `.env` file in `memgate/`:
 
 ```env
 VITE_FIREBASE_API_KEY=your_api_key
@@ -63,82 +181,58 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-### 3. Run locally
-
 ```bash
-npm run dev
+npm run dev        # start dev server at localhost:5173
+npm run build      # production build → dist/
+firebase deploy    # deploy to Firebase Hosting
 ```
 
-### 4. Deploy (Firebase Hosting)
-
-```bash
-npm run build
-firebase deploy
-```
-
----
-
-## Chrome Extension
-
-The `memgate-extension/` folder contains a Chrome extension that intercepts navigation to blocked sites.
-
-1. Open `chrome://extensions`
-2. Enable **Developer mode**
-3. Click **Load unpacked** and select the `memgate-extension/` folder
-4. The extension will redirect blocked sites to your MemGate app URL with a `?challenge=` param
-
----
-
-## Games — detailed rules
-
-### N-Back (30 seconds)
-A letter flashes at a grid position every 1–2.2 seconds depending on difficulty. Press:
-- `L` — letter matches N steps ago
-- `P` — position matches N steps ago (dual mode)
-- `A` / `S` — no match (single / dual mode)
-
-The game ends when the 30-second timer runs out. Positions never repeat on consecutive steps, ensuring uniform grid coverage.
-
-### Spatial Recall
-**Round 1 (4×4):** Six cells light up for 5 seconds. Click to reproduce the pattern. Score ≥ 60% to unlock Round 2.
-
-**Round 2 (6×6):** Two separate patterns flash sequentially, 5 seconds each. Reproduce the combined pattern from memory. Final score is the average of both rounds.
-
-### Word Encoding
-- 15 seconds to study the word list
-- 10-second math distractor (arithmetic problems)
-- 45 seconds to free-recall as many words as possible
-- All words are common everyday English words
+For local extension testing, the manifest already includes `http://localhost:5173/*` as a content script match.
 
 ---
 
 ## Project structure
 
 ```
-memgate/
-├── src/
-│   ├── components/
-│   │   ├── games/
-│   │   │   ├── NBackGame.jsx
-│   │   │   ├── SpatialRecallGame.jsx
-│   │   │   └── WordRecallGame.jsx
-│   │   ├── layout/
-│   │   ├── Dashboard.jsx
-│   │   ├── GameHub.jsx
-│   │   ├── Leaderboard.jsx
-│   │   └── LockMode.jsx
-│   ├── utils/
-│   │   ├── difficulty.js   # game params + adaptive difficulty logic
-│   │   └── words.js        # word pool for Word Encoding game
-│   ├── contexts/AuthContext.jsx
-│   ├── hooks/
-│   └── config/firebase.js
-memgate-extension/          # Chrome extension
-expo-app/                   # Mobile app (Expo / React Native)
+MemGate/
+├── memgate/                    # React web app
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── games/
+│   │   │   │   ├── NBackGame.jsx
+│   │   │   │   ├── SpatialRecallGame.jsx
+│   │   │   │   └── WordRecallGame.jsx
+│   │   │   ├── ChallengeGate.jsx   # shown when extension intercepts a site
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── GameHub.jsx
+│   │   │   ├── Leaderboard.jsx
+│   │   │   └── LockMode.jsx
+│   │   ├── utils/
+│   │   │   ├── difficulty.js       # game params + adaptive difficulty
+│   │   │   └── words.js            # word pool + dictionaryapi.dev validation
+│   │   ├── contexts/AuthContext.jsx
+│   │   └── config/firebase.js
+│   └── memgate-extension/      # Chrome extension (load unpacked)
+│       ├── manifest.json
+│       ├── background.js       # intercepts navigation, manages unlock windows
+│       └── content_script.js   # syncs settings, relays challenge-passed event
 ```
+
+---
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Frontend | React 18 + Vite |
+| Styling | Tailwind CSS |
+| Auth + DB | Firebase (Google Auth + Firestore) |
+| Charts | Recharts |
+| Word validation | [Free Dictionary API](https://dictionaryapi.dev/) |
+| Hosting | Firebase Hosting |
 
 ---
 
 ## License
 
-MIT
+MIT — free to use, fork, and modify.
