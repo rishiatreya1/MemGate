@@ -46,7 +46,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
 
     if (!match) return
 
-    // Check if temporarily unlocked (10-minute window)
+    // Check if temporarily unlocked (30-minute window)
     const expiry = unlocked[match.name]
     if (expiry && Date.now() < expiry) return
 
@@ -73,12 +73,12 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     return
   }
 
-  // Unlock: user passed a challenge — grant 10-minute access to that site
+  // Unlock: user passed a challenge — grant 30-minute access to that site
   if (msg.type === 'UNLOCK') {
     chrome.storage.local.get('mg_unlocked', ({ mg_unlocked = {} }) => {
       const updated = {
         ...mg_unlocked,
-        [msg.site]: Date.now() + 10 * 60 * 1000,   // 10 minutes from now
+        [msg.site]: Date.now() + 30 * 60 * 1000,   // 30 minutes from now
       }
       chrome.storage.local.set({ mg_unlocked: updated }, () => {
         sendResponse({ ok: true })

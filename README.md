@@ -1,6 +1,6 @@
 # MemGate
 
-> **Earn your distractions.** MemGate gates your most-visited time-sink sites behind a quick memory challenge. Pass the test, get 10 minutes of access. Skip the test, skip the site.
+> **Earn your distractions.** MemGate gates your most-visited time-sink sites behind a quick memory challenge. Pass the test, get 30 minutes of access. Skip the test, skip the site.
 
 **Live app → [memgateofficial.web.app](https://memgateofficial.web.app)**
 
@@ -13,7 +13,7 @@
 1. You add a site to your lock list (e.g. YouTube, Reddit, Twitter)
 2. The Chrome extension intercepts any navigation to that site
 3. You're redirected to a 60-second memory challenge
-4. Score ≥ 60% → 10 minutes of access granted
+4. Score ≥ 60% → 30 minutes of access granted
 5. Time's up → the gate resets
 
 Difficulty adapts automatically based on your performance across sessions.
@@ -112,7 +112,7 @@ Score = (words correctly recalled) / 8 × 100%.
 - **Score history** — trend charts show your cognitive performance over time
 - **Leaderboard** — see how your scores compare across sessions
 - **Per-site game assignment** — lock YouTube to Word Recall, Reddit to N-Back, etc.
-- **10-minute unlock window** — pass once, browse freely for 10 minutes before the gate resets
+- **30-minute unlock window — pass once, browse freely for 30 minutes before the gate resets
 - **Cross-device sync** — scores and settings stored in Firebase, available on any device you sign in to
 
 ---

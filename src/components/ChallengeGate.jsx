@@ -52,7 +52,7 @@ export default function ChallengeGate({ site, returnUrl, difficulty, onPass }) {
     setScore(score)
     if (score >= PASS_THRESHOLD) {
       setPhase('passed')
-      // Notify the content script → background worker → grant 10-min unlock
+      // Notify the content script → background worker → grant 30-min unlock
       window.dispatchEvent(
         new CustomEvent('memgate:challenge-passed', { detail: { site, returnUrl } })
       )
@@ -84,7 +84,7 @@ export default function ChallengeGate({ site, returnUrl, difficulty, onPass }) {
 
           <div className="card p-4 text-sm text-gray-400 leading-relaxed">
             This site is gated by <span className="text-cyan-400 font-medium">MemGate</span>.
-            Pass a memory challenge to earn 10 minutes of access.
+            Pass a memory challenge to earn 30 minutes of access.
           </div>
 
           <div className="text-gray-600 text-xs">
