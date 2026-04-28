@@ -237,4 +237,5 @@ MemGate/
 
 ## License
 
-Rishi Atreya
+Rishi Atreya 
+(thyrishi@gmail.com)
